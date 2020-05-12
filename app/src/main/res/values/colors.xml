@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+
+    <color name="chelsea_cucumber">#94B55A</color>
+    <color name="chalet_green">#5E703D</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="color_A9A9A9">#A9A9A9</color>
+    <color name="color_FFFFFF">#ffffff</color>
+    <color name="color_000000">#000000</color>
+</resources>

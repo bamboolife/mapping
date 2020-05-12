@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_FFFFFF">
+
+    <include
+        android:id="@+id/il_head"
+        layout="@layout/include_head" />
+
+    <ImageView
+        android:id="@+id/iv_head"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/il_head"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/ic_app" />
+
+    <TextView
+        android:id="@+id/tv_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_head"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:text="番茄思维导图"
+        android:textColor="#000000"
+        android:textSize="28sp" />
+
+    <EditText
+        android:id="@+id/et_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_center"
+        android:layout_margin="30dp"
+        android:layout_marginTop="56dp"
+        android:hint="手机号"
+        android:inputType="number"
+        android:maxLength="11"
+        android:textSize="17sp" />
+
+    <EditText
+        android:id="@+id/et_pwd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_phone"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:hint="密码"
+        android:inputType="textPassword"
+        android:maxLength="10"
+        android:minLines="6"
+        android:textSize="17sp" />
+
+
+    <Button
+        android:textSize="18sp"
+        android:id="@+id/bt_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_pwd"
+        android:layout_margin="60dp"
+        android:background="@drawable/pay_year"
+        android:padding="10dp"
+        android:text="注册/登录" />
+
+    <TextView
+        android:id="@+id/tv_pwd"
+        android:layout_width="80dp"
+        android:layout_height="25dp"
+        android:layout_below="@id/bt_login"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="-30dp"
+        android:layout_marginRight="20dp"
+        android:gravity="center"
+        android:text="忘记密码"
+        android:textSize="14sp" />
+</RelativeLayout>

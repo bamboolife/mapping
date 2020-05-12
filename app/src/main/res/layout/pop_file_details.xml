@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:background="#ffffff"
+	android:divider="@drawable/divider"
+	android:orientation="vertical"
+	android:showDividers="middle">
+
+	<TextView
+		android:id="@+id/tv_rename"
+		android:layout_width="match_parent"
+		android:layout_height="48dp"
+		android:background="?attr/selectableItemBackground"
+		android:gravity="center"
+		android:text="重命名"
+		android:textColor="#111"
+		android:textSize="14sp" />
+
+	<TextView
+		android:id="@+id/tv_copy"
+		android:layout_width="match_parent"
+		android:layout_height="48dp"
+		android:background="?attr/selectableItemBackground"
+		android:gravity="center"
+		android:text="转移"
+		android:textColor="#111"
+		android:textSize="14sp" />
+
+	<TextView
+		android:id="@+id/tv_delete"
+		android:layout_width="match_parent"
+		android:layout_height="48dp"
+		android:background="?attr/selectableItemBackground"
+		android:gravity="center"
+		android:text="删除"
+		android:textColor="#DC143C"
+		android:textSize="14sp" />
+
+	<TextView
+		android:id="@+id/tv_cancel"
+		android:layout_width="match_parent"
+		android:layout_height="48dp"
+		android:layout_marginTop="12dp"
+		android:background="?attr/selectableItemBackground"
+		android:gravity="center"
+		android:text="取消"
+		android:textColor="#8000"
+		android:textSize="14sp" />
+
+</LinearLayout>
