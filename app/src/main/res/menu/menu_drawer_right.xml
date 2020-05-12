@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/import_image"
+        android:icon="@mipmap/import_image"
+        android:title="@string/import_image" />
+
+    <item
+        android:id="@+id/save"
+        android:icon="@mipmap/save"
+        android:title="@string/save" />
+
+    <item
+        android:id="@+id/newly_build"
+        android:icon="@mipmap/newly_build"
+        android:title="@string/newly_build" />
+
+    <item
+        android:id="@+id/file_list"
+        android:icon="@mipmap/file_list"
+        android:title="@string/file_list" />
+    <item
+        android:id="@+id/share"
+        android:icon="@mipmap/share"
+        android:title="@string/share" />
+    <item
+        android:id="@+id/pay"
+        android:icon="@mipmap/pay"
+        android:title="@string/equities" />
+    <item
+        android:id="@+id/suggestion"
+        android:icon="@mipmap/suggestion"
+        android:title="@string/suggestion" />
+    <item
+        android:id="@+id/logout"
+        android:visible="false"
+        app:actionLayout="@layout/menu_button" />
+
+
+</menu>

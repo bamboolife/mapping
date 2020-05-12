@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">番茄思维导图</string>
+    <string name="import_image" translatable="false">导出图片</string>
+    <string name="save">保存</string>
+    <string name="newly_build">新建</string>
+    <string name="file_list">文件列表</string>
+    <string name="share">分享</string>
+    <string name="suggestion" translatable="false">建议</string>
+    <string name="equities">权益</string>
+    <string name="tv_free">免费版</string>
+</resources>

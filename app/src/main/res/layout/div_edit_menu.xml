@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/chelsea_cucumber"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="1dp">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    >
+    <Button
+        android:id="@+id/btn_add_sub"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="添加接点" />
+
+    <Button
+        android:id="@+id/btn_add_node"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="子节点" />
+
+    <Button
+        android:id="@+id/btn_top"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="上节点" />
+
+    <Button
+        android:id="@+id/btn_bottom"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="下节点" />
+
+    <Button
+        android:id="@+id/btn_focus_mid"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:text="居中" />
+</LinearLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    >
+    <Button
+        android:id="@+id/btn_del"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="删除" />
+    <Button
+        android:id="@+id/btn_copy"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="复制节点" />
+    <Button
+        android:id="@+id/btn_paste"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="粘贴节点" />
+
+</LinearLayout>
+</LinearLayout>
