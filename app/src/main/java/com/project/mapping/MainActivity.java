@@ -166,11 +166,6 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void initView() {
-//        treeV = findViewById(R.id.edit_map_tree_view);
-//        btAddSub = findViewById(R.id.btn_add_sub);
-//        btnTop = findViewById(R.id.btn_top);
-//        btnBottom = findViewById(R.id.btn_bottom);
-//        btnDel = findViewById(R.id.btn_del);
         btAddNode = findViewById(R.id.btn_add_node);
         btFocus = findViewById(R.id.btn_focus_mid);
         btnCopy = findViewById(R.id.btn_copy);
@@ -216,14 +211,6 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private void initListener() {
         mIvDrawerOpen.setOnClickListener(this);
         mNvMenuRight.setNavigationItemSelectedListener(this);
-//        btAddNode.setOnClickListener(this);
-//        btFocus.setOnClickListener(this);
-//        btAddSub.setOnClickListener(this);
-//        btnTop.setOnClickListener(this);
-//        btnBottom.setOnClickListener(this);
-//        btnDel.setOnClickListener(this);
-//        btnCopy.setOnClickListener(this);
-//        btnPaste.setOnClickListener(this);
         imgTop.setOnClickListener(this);
         imgBottom.setOnClickListener(this);
         imgDel.setOnClickListener(this);
@@ -605,7 +592,6 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         ToastUtil.showToast("已拒绝获取电话或存储空间权限并不再询问", this);
-//        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
         new AlertDialog
                 .Builder(this).setMessage("此功能需要电话和存储空间权限，否则无法正常使用，是否打开设置").setCancelable(false)
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
@@ -625,9 +611,6 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 })
                 .show();
 
-//        } else {
-//            finish();
-//        }
     }
 
     public static void gotoAppDetailIntent(Activity activity) {
