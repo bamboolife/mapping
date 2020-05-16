@@ -592,6 +592,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         ToastUtil.showToast("已拒绝获取电话或存储空间权限并不再询问", this);
+//        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
         new AlertDialog
                 .Builder(this).setMessage("此功能需要电话和存储空间权限，否则无法正常使用，是否打开设置").setCancelable(false)
                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
@@ -611,6 +612,9 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 })
                 .show();
 
+//        } else {
+//            finish();
+//        }
     }
 
     public static void gotoAppDetailIntent(Activity activity) {
