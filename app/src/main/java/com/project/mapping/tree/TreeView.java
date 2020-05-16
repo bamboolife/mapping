@@ -372,7 +372,7 @@ public class TreeView extends ViewGroup {
             @Override
             public void focusChange(boolean b, NodeModel<String> nm) {
                 mCurrentFocus = nm;
-                Log.e(TAG, "focusChange: "+ b);
+                Log.e(TAG, "focusChange: "+ b + "  " + nm.strContent);
             }
         });
         nodeView.setOnLongClickListener(new OnLongClickListener() {
@@ -598,12 +598,12 @@ public class TreeView extends ViewGroup {
         if (node == null) return;
 
         //设置current的选择
-        setCurrentSelectedNode(node.getParentNode());
 
         NodeModel<String> parentNode = node.getParentNode();
         if (parentNode != null) {
             //切断
             mTreeModel.removeNode(parentNode, node);
+            setCurrentSelectedNode(parentNode);
         }
 
         //清理碎片
