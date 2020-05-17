@@ -44,6 +44,7 @@ import com.project.mapping.ui.fragment.FileListFragment;
 import com.project.mapping.ui.fragment.LoginFragment;
 import com.project.mapping.ui.fragment.PayFragment;
 import com.project.mapping.ui.fragment.SuggestionFragment;
+import com.project.mapping.util.DensityUtils;
 import com.project.mapping.util.DeviceUtil;
 import com.project.mapping.util.FileBlock;
 import com.project.mapping.util.FileUtils;
@@ -474,7 +475,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private void showSharePop() {
         View view = View.inflate(this, R.layout.pop_share, null);
         mPopupWindow = new PopupWindow(view,
-                ViewGroup.LayoutParams.MATCH_PARENT, 400);
+                ViewGroup.LayoutParams.MATCH_PARENT, DensityUtils.dp2px(this,160));
         mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
         mPopupWindow.setFocusable(true);
         mPopupWindow.setOutsideTouchable(true);
