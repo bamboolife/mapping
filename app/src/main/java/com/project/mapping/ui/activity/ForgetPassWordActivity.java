@@ -26,8 +26,6 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.reactivex.functions.Consumer;
-
 public class ForgetPassWordActivity extends RxAppCompatActivity implements View.OnClickListener {
 
     private EditText mEtPhone, mEtCode, mEtPwd;
@@ -106,17 +104,14 @@ public class ForgetPassWordActivity extends RxAppCompatActivity implements View.
                     map.put(Constant.PASSWORD, mPwd);
                     RetrofitManager.getInstance().getService().postForgetPwd(map)
                             .compose(Transformers.<DataBean>applySchedulers(this, ActivityEvent.DESTROY))
-                            .subscribe(new Consumer<DataBean>() {
-                                @Override
-                                public void accept(DataBean dataBean) throws Exception {
-                                    Log.d("===postForgetPwd===", dataBean.toString());
-                                    if (dataBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
-                                        SPUtil.put(Constant.LOGIN, false);
-                                        ToastUtil.showToast("密码修改成功，请重新登录", ForgetPassWordActivity.this);
-                                        finish();
-                                    } else {
-                                        ToastUtil.showToast(dataBean.getMessage(), ForgetPassWordActivity.this);
-                                    }
+                            .subscribe(dataBean -> {
+                                Log.d("===postForgetPwd===", dataBean.toString());
+                                if (dataBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
+                                    SPUtil.put(Constant.LOGIN, false);
+                                    ToastUtil.showToast("密码修改成功，请重新登录", ForgetPassWordActivity.this);
+                                    finish();
+                                } else {
+                                    ToastUtil.showToast(dataBean.getMessage(), ForgetPassWordActivity.this);
                                 }
                             });
                 }
@@ -129,15 +124,12 @@ public class ForgetPassWordActivity extends RxAppCompatActivity implements View.
     private void getMessage() {
         RetrofitManager.getInstance().getService().getMessage(mPhoneNumber).
                 compose(Transformers.<DataBean>applySchedulers(this, ActivityEvent.DESTROY)).
-                subscribe(new Consumer<DataBean>() {
-                    @Override
-                    public void accept(DataBean dataBean) throws Exception {
-                        Log.d("===getMessage===", dataBean.toString());
-                        if (dataBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
-                            ToastUtil.showToast("验证码发送成功，请查看手机", ForgetPassWordActivity.this);
-                        } else {
-                            ToastUtil.showToast(dataBean.getMessage(), ForgetPassWordActivity.this);
-                        }
+                subscribe(dataBean -> {
+                    Log.d("===getMessage===", dataBean.toString());
+                    if (dataBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
+                        ToastUtil.showToast("验证码发送成功，请查看手机", ForgetPassWordActivity.this);
+                    } else {
+                        ToastUtil.showToast(dataBean.getMessage(), ForgetPassWordActivity.this);
                     }
                 });
     }

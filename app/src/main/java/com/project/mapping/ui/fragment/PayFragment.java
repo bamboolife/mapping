@@ -30,8 +30,6 @@ import com.trello.rxlifecycle2.android.FragmentEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.reactivex.functions.Consumer;
-
 public class PayFragment extends BaseFragment {
 
     private IWXAPI iwxapi;
@@ -127,20 +125,17 @@ public class PayFragment extends BaseFragment {
                 map.put(Constant.EQUIPMENT_ID, DeviceUtil.getDeviceId(getActivity()));
                 RetrofitManager.getInstance().getService().postUnifiedOrder(map).
                         compose(Transformers.applySchedulers(PayFragment.this, FragmentEvent.DESTROY))
-                        .subscribe(new Consumer<PayBean>() {
-                            @Override
-                            public void accept(PayBean payBean) throws Exception {
-                                Log.d("===pay=1==", payBean.toString());
-                                if (payBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
-                                    PayBean.DataBean payBeanData = payBean.getData();
-                                    startWx(payBeanData.getAppid(),
-                                            payBeanData.getPartnerid(),
-                                            payBeanData.getPrepayid(),
-                                            payBeanData.getPackageX(),
-                                            payBeanData.getNoncestr(),
-                                            payBeanData.getTimestamp(),
-                                            payBeanData.getSign());
-                                }
+                        .subscribe(payBean -> {
+                            Log.d("===pay=1==", payBean.toString());
+                            if (payBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
+                                PayBean.DataBean payBeanData = payBean.getData();
+                                startWx(payBeanData.getAppid(),
+                                        payBeanData.getPartnerid(),
+                                        payBeanData.getPrepayid(),
+                                        payBeanData.getPackageX(),
+                                        payBeanData.getNoncestr(),
+                                        payBeanData.getTimestamp(),
+                                        payBeanData.getSign());
                             }
                         });
             }
@@ -155,20 +150,17 @@ public class PayFragment extends BaseFragment {
                 map.put(Constant.EQUIPMENT_ID, DeviceUtil.getDeviceId(getActivity()));
                 RetrofitManager.getInstance().getService().postUnifiedOrder(map).
                         compose(Transformers.applySchedulers(PayFragment.this, FragmentEvent.DESTROY)).
-                        subscribe(new Consumer<PayBean>() {
-                            @Override
-                            public void accept(PayBean payBean) throws Exception {
-                                Log.d("===pay=2==", payBean.toString());
-                                if (payBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
-                                    PayBean.DataBean payBeanData = payBean.getData();
-                                    startWx(payBeanData.getAppid(),
-                                            payBeanData.getPartnerid(),
-                                            payBeanData.getPrepayid(),
-                                            payBeanData.getPackageX(),
-                                            payBeanData.getNoncestr(),
-                                            payBeanData.getTimestamp(),
-                                            payBeanData.getSign());
-                                }
+                        subscribe(payBean -> {
+                            Log.d("===pay=2==", payBean.toString());
+                            if (payBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
+                                PayBean.DataBean payBeanData = payBean.getData();
+                                startWx(payBeanData.getAppid(),
+                                        payBeanData.getPartnerid(),
+                                        payBeanData.getPrepayid(),
+                                        payBeanData.getPackageX(),
+                                        payBeanData.getNoncestr(),
+                                        payBeanData.getTimestamp(),
+                                        payBeanData.getSign());
                             }
                         });
             }

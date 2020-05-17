@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nineoldandroids.animation.ObjectAnimator;
+import com.project.mapping.MappingApplication;
 import com.project.mapping.R;
 import com.project.mapping.tree.line.EaseCubicInterpolator;
 import com.project.mapping.tree.model.NodeModel;
@@ -96,10 +97,13 @@ public class TreeView extends ViewGroup {
 
     public void initMapping(TreeModel<String> data) {
         if (null == data) {
+            MappingApplication.isRandom = false;
             NodeModel<String> nm	= new NodeModel<>("");
             nm.level				= TreeConstant.LEVEL_0;
             nm.lineColor			= Color.rgb(117, 148, 230);
             data	= new TreeModel<>(nm);
+        }else{
+            MappingApplication.isRandom = true;
         }
         this.setTreeModel(data);
 //        KeyboardUtils.showInput(this, nv.et);

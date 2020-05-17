@@ -11,6 +11,8 @@ public class MappingApplication extends Application {
     public static int treeWidth;
     public static int treeHeight;
 
+    public static boolean isRandom;
+
     @Override
 
     public void onCreate() {

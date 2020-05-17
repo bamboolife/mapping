@@ -2,6 +2,7 @@ package com.project.mapping.util;
 
 import android.graphics.Color;
 
+import com.project.mapping.MappingApplication;
 import com.project.mapping.tree.TreeUtils;
 import com.project.mapping.tree.model.NodeModel;
 
@@ -50,18 +51,39 @@ public class ColorHelper {
         LinkedList<NodeModel<String>> linked;
         if (sub) {
             linked = node.getChildNodes();
-            if(linked.isEmpty()){
-                return getRandomColor();
-            }
-            NodeModel<String> temp = linked.getLast();
-            while (true) {
-                int r = new Random().nextInt(7);
-                if (temp.lineColor != iColor[r]) {
-                    return iColor[r];
+
+            if (linked.isEmpty()) {
+                if (MappingApplication.isRandom) {
+                    return getRandomColor();
+                } else {
+                    return iColor[0];
                 }
-                System.out.println("ColorHelper getRandomColor sub : " + r);
+            }
+
+            NodeModel<String> temp = linked.getLast();
+            if (MappingApplication.isRandom) {
+                while (true) {
+                    int r = new Random().nextInt(7);
+                    if (temp.lineColor != iColor[r]) {
+                        return iColor[r];
+                    }
+                    System.out.println("ColorHelper getRandomColor sub : " + r);
+                }
+            } else {
+                for (int i = 0; i < iColor.length; i++) {
+                    if (temp.lineColor == iColor[i] && i < iColor.length - 1) {
+                        return iColor[i + 1];
+                    }
+                    if (temp.lineColor == iColor[i] && i == iColor.length - 1) {
+                        return iColor[0];
+                    }
+                }
             }
         }
+        //变成随机
+        MappingApplication.isRandom = true;
+
+
         linked = node.getParentNode().getChildNodes();
         int index = TreeUtils.getInstance().focusIndex(node);
         int color1 = -1;
@@ -74,7 +96,7 @@ public class ColorHelper {
         if (index != linked.size() - 1) {
             color2 = linked.get(index + 1).lineColor;
         }
-
+//        if (MappingApplication.isRandom) {
         while (true) {
             int r = new Random().nextInt(7);
             if (color != iColor[r] && color1 != iColor[r] && color2 != iColor[r]) {
@@ -82,5 +104,14 @@ public class ColorHelper {
             }
             System.out.println("ColorHelper getRandomColor : " + r);
         }
+//        } else {
+//           for(int i=0;i<iColor.length;i++){
+//               if (color != iColor[r] && color1 != iColor[r] && color2 != iColor[r]) {
+//                   return iColor[r];
+//               }
+//           }
+//
+//            return 1;
+//        }
     }
 }
