@@ -3,16 +3,20 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:importantForAccessibility="yes"
+    android:focusable="false"
     android:orientation="vertical">
 
     <EditText
         android:id="@+id/et_title"
         android:layout_width="wrap_content"
-        android:layout_height="24dp"
+        android:maxWidth="200dp"
+        android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:gravity="bottom"
         android:includeFontPadding="false"
         android:minEms="3"
+        android:maxLines="60"
+        android:inputType="textMultiLine"
         android:paddingLeft="10dp"
         android:paddingRight="36dp"
         android:singleLine="true"
@@ -23,6 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="16dp"
         android:layout_marginTop="-8dp"
+        android:focusable="false"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
@@ -42,6 +47,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:padding="4dp"
+            android:focusable="true"
             android:background="@mipmap/add_view"/>
     </LinearLayout>
 

@@ -44,6 +44,7 @@ import com.project.mapping.ui.fragment.FileListFragment;
 import com.project.mapping.ui.fragment.LoginFragment;
 import com.project.mapping.ui.fragment.PayFragment;
 import com.project.mapping.ui.fragment.SuggestionFragment;
+import com.project.mapping.util.DensityUtils;
 import com.project.mapping.util.DeviceUtil;
 import com.project.mapping.util.FileBlock;
 import com.project.mapping.util.FileUtils;
@@ -67,7 +68,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.functions.Consumer;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends RxAppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener,
@@ -99,7 +99,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private IWXAPI wxapi;
     boolean isBuild = false;
     private boolean isJumpFileList = false;
-    private boolean isSave =false;
+    private boolean isSave = false;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -152,25 +152,15 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         mIsLogin = SPUtil.getBoolean(Constant.LOGIN, false);
         mNumberLast4 = SPUtil.getString(Constant.NUMBER_LAST_4, "1234");
         Map<String, String> map = new HashMap<>();
-        map.put(Constant.CHANNEL_SOURCES, "10086");
+        map.put(Constant.CHANNEL_SOURCES, Constant.CHANNEL_ID);
         map.put(Constant.EQUIPMENT_ID, DeviceUtil.getDeviceId(this));
         map.put(Constant.EQUIPMENT_MODEL, DeviceUtil.getDeviceModel());
         RetrofitManager.getInstance().getService().putReportDevices(map).
                 compose(Transformers.<DataBean>applySchedulers(this, ActivityEvent.DESTROY)).
-                subscribe(new Consumer<DataBean>() {
-                    @Override
-                    public void accept(DataBean dataBean) throws Exception {
-                        Log.d("===putReportDevices===", dataBean.toString());
-                    }
-                });
+                subscribe(dataBean -> Log.d("===putReportDevices===", dataBean.toString()));
     }
 
     private void initView() {
-//        treeV = findViewById(R.id.edit_map_tree_view);
-//        btAddSub = findViewById(R.id.btn_add_sub);
-//        btnTop = findViewById(R.id.btn_top);
-//        btnBottom = findViewById(R.id.btn_bottom);
-//        btnDel = findViewById(R.id.btn_del);
         btAddNode = findViewById(R.id.btn_add_node);
         btFocus = findViewById(R.id.btn_focus_mid);
         btnCopy = findViewById(R.id.btn_copy);
@@ -216,14 +206,6 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private void initListener() {
         mIvDrawerOpen.setOnClickListener(this);
         mNvMenuRight.setNavigationItemSelectedListener(this);
-//        btAddNode.setOnClickListener(this);
-//        btFocus.setOnClickListener(this);
-//        btAddSub.setOnClickListener(this);
-//        btnTop.setOnClickListener(this);
-//        btnBottom.setOnClickListener(this);
-//        btnDel.setOnClickListener(this);
-//        btnCopy.setOnClickListener(this);
-//        btnPaste.setOnClickListener(this);
         imgTop.setOnClickListener(this);
         imgBottom.setOnClickListener(this);
         imgDel.setOnClickListener(this);
@@ -354,6 +336,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 } else {
                     if (cb != null) {
                         cb.onFail("不需要存储");
+                        MappingApplication.isRandom = false;
                     }
                 }
                 if (isSave) {
@@ -438,6 +421,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                         treeV.initMapping(null);
                         path = null;
                     }
+
                     @Override
                     public void onFail(String msg) {
 //                        treeV.initMapping(null);
@@ -491,7 +475,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private void showSharePop() {
         View view = View.inflate(this, R.layout.pop_share, null);
         mPopupWindow = new PopupWindow(view,
-                ViewGroup.LayoutParams.MATCH_PARENT, 400);
+                ViewGroup.LayoutParams.MATCH_PARENT, DensityUtils.dp2px(this,160));
         mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
         mPopupWindow.setFocusable(true);
         mPopupWindow.setOutsideTouchable(true);
@@ -707,16 +691,14 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private void getOrderType() {
         RetrofitManager.getInstance().getService().
                 getOrderType(DeviceUtil.getDeviceId(this)).
-                compose(Transformers.applySchedulers(this, ActivityEvent.DESTROY)).subscribe(new Consumer<DataBean>() {
-            @Override
-            public void accept(DataBean dataBean) throws Exception {
-                Log.d("==getOrderType==", dataBean.toString());
-                if (dataBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
-                    SPUtil.put(Constant.PAY_TYPE, dataBean.getData());
-                    mTvPayType.setText(dataBean.getData());
-                }
-            }
-        });
+                compose(Transformers.applySchedulers(this, ActivityEvent.DESTROY)).
+                subscribe(dataBean -> {
+                    Log.d("==getOrderType==", dataBean.toString());
+                    if (dataBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
+                        SPUtil.put(Constant.PAY_TYPE, dataBean.getData());
+                        mTvPayType.setText(dataBean.getData());
+                    }
+                });
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.project.mapping.ui.fragment;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -29,8 +28,6 @@ import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import io.reactivex.functions.Consumer;
 
 public class LoginFragment extends BaseFragment implements View.OnClickListener {
 
@@ -103,23 +100,19 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
             map.put(Constant.PASSWORD, pwd);
             RetrofitManager.getInstance().getService().postLoginOrRegister(map).
                     compose(Transformers.<DataBean>applySchedulers(this, FragmentEvent.DESTROY))
-                    .subscribe(new Consumer<DataBean>() {
-                        @SuppressLint("CheckResult")
-                        @Override
-                        public void accept(DataBean dataBean) throws Exception {
-                            Log.d("===postLoginOrRegister===", dataBean.toString());
-                            if (dataBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
-                                ToastUtil.showToast("登录成功", getActivity());
-                                SPUtil.put(Constant.NUMBER_LAST_4, phoneNumber.substring(7, 11));
-                                SPUtil.put(Constant.PAY_TYPE, dataBean.getData());
-                                SPUtil.put(Constant.LOGIN, true);
-                                int backStackEntryCount = getActivity().getSupportFragmentManager().getBackStackEntryCount();
-                                if (backStackEntryCount >= 1) {
-                                    getActivity().getSupportFragmentManager().popBackStackImmediate();
-                                }
-                            } else {
-                                ToastUtil.showToast(dataBean.getMessage(), getActivity());
+                    .subscribe(dataBean -> {
+                        Log.d("===postLoginOrRegister===", dataBean.toString());
+                        if (dataBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
+                            ToastUtil.showToast("登录成功", getActivity());
+                            SPUtil.put(Constant.NUMBER_LAST_4, phoneNumber.substring(7, 11));
+                            SPUtil.put(Constant.PAY_TYPE, dataBean.getData());
+                            SPUtil.put(Constant.LOGIN, true);
+                            int backStackEntryCount = getActivity().getSupportFragmentManager().getBackStackEntryCount();
+                            if (backStackEntryCount >= 1) {
+                                getActivity().getSupportFragmentManager().popBackStackImmediate();
                             }
+                        } else {
+                            ToastUtil.showToast(dataBean.getMessage(), getActivity());
                         }
                     });
         }

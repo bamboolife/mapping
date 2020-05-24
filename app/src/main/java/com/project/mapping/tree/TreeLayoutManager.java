@@ -48,17 +48,17 @@ public class TreeLayoutManager {
 		tree.setNodeFocus(tree.findNodeViewFromNodeModel(tree.getCurrentFocusNode()));
 		Log.e("refreshView", tree.getLeft() + "  " + tree.getMeasuredWidth() + "  " + tree.getMeasuredHeight());
 
-			Rect rect		= new Rect();
-			tree.getWindowVisibleDisplayFrame(rect);
-			int hei			= rect.bottom - rect.top;
-			int wid			= rect.right  - rect.left;
+		Rect rect		= new Rect();
+		tree.getWindowVisibleDisplayFrame(rect);
+		int hei			= rect.bottom - rect.top;
+		int wid			= rect.right  - rect.left;
 
-			if (mTreeModel.getRootNode().boxH < hei) {
-				tree.setTop((int) ((hei - mTreeModel.getRootNode().boxH) / 2));
-			}
-			if (mTreeModel.getRootNode().boxW < wid) {
-				tree.setLeft((int) ((wid - mTreeModel.getRootNode().boxW) / 2));
-			}
+		if (mTreeModel.getRootNode().boxH < hei) {
+			tree.setTop((int) ((hei - mTreeModel.getRootNode().boxH) / 2));
+		}
+		if (mTreeModel.getRootNode().boxW < wid) {
+			tree.setLeft((int) ((wid - mTreeModel.getRootNode().boxW) / 2));
+		}
 	}
 
 	private void parseLocation(TreeView tree, NodeModel<String> parent) {
@@ -89,11 +89,12 @@ public class TreeLayoutManager {
 		nodeView.setScaleX(scale);
 		nodeView.setScaleY(scale);
 
+		int lastY		= (int) (top + parent.boxH);
 		LinkedList<NodeModel<String>> childNodes = parent.childNodes;
-		for (int i = 0, lastY = top; i < childNodes.size(); i++) {
+		for (int i = childNodes.size() - 1; i >= 0; i--) {
 			NodeModel<String> child = childNodes.get(i);
+			lastY -= child.boxH;
 			printRect(child, (int)(left + parent.nodeW + dp24), lastY);
-			lastY += child.boxH;
 		}
 	}
 }

@@ -46,4 +46,5 @@ public interface Constant {
     String PAY_SUCCESSFUL = "pay_successful";
     String PAY_FAIL = "pay_fail";
     String PAY_CANCEL = "pay_cancel";
+    String CHANNEL_ID = "10086";
 }

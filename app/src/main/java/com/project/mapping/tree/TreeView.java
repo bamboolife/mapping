@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nineoldandroids.animation.ObjectAnimator;
+import com.project.mapping.MappingApplication;
 import com.project.mapping.R;
 import com.project.mapping.tree.line.EaseCubicInterpolator;
 import com.project.mapping.tree.model.NodeModel;
@@ -96,10 +97,13 @@ public class TreeView extends ViewGroup {
 
     public void initMapping(TreeModel<String> data) {
         if (null == data) {
+            MappingApplication.isRandom = false;
             NodeModel<String> nm	= new NodeModel<>("");
             nm.level				= TreeConstant.LEVEL_0;
             nm.lineColor			= Color.rgb(117, 148, 230);
             data	= new TreeModel<>(nm);
+        }else{
+            MappingApplication.isRandom = true;
         }
         this.setTreeModel(data);
 //        KeyboardUtils.showInput(this, nv.et);
@@ -372,7 +376,7 @@ public class TreeView extends ViewGroup {
             @Override
             public void focusChange(boolean b, NodeModel<String> nm) {
                 mCurrentFocus = nm;
-                Log.e(TAG, "focusChange: "+ b);
+                Log.e(TAG, "focusChange: "+ b + "  " + nm.strContent);
             }
         });
         nodeView.setOnLongClickListener(new OnLongClickListener() {
@@ -598,12 +602,12 @@ public class TreeView extends ViewGroup {
         if (node == null) return;
 
         //设置current的选择
-        setCurrentSelectedNode(node.getParentNode());
 
         NodeModel<String> parentNode = node.getParentNode();
         if (parentNode != null) {
             //切断
             mTreeModel.removeNode(parentNode, node);
+            setCurrentSelectedNode(parentNode);
         }
 
         //清理碎片
