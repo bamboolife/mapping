@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import com.project.mapping.tree.model.ForTreeItem;
 import com.project.mapping.tree.model.NodeModel;
 import com.project.mapping.tree.model.TreeModel;
-import com.project.mapping.util.DensityUtils;
 
 import java.util.LinkedList;
 
@@ -89,12 +88,19 @@ public class TreeLayoutManager {
 		nodeView.setScaleX(scale);
 		nodeView.setScaleY(scale);
 
-		int lastY		= (int) (top + parent.boxH);
 		LinkedList<NodeModel<String>> childNodes = parent.childNodes;
-		for (int i = childNodes.size() - 1; i >= 0; i--) {
+		for (int i = 0, lastY = top; i < childNodes.size(); i++) {
 			NodeModel<String> child = childNodes.get(i);
-			lastY -= child.boxH;
 			printRect(child, (int)(left + parent.nodeW + dp24), lastY);
+			lastY += child.boxH;
 		}
+
+//		int lastY		= (int) (top + parent.boxH);
+//		LinkedList<NodeModel<String>> childNodes = parent.childNodes;
+//		for (int i = childNodes.size() - 1; i >= 0; i--) {
+//			NodeModel<String> child = childNodes.get(i);
+//			lastY -= child.boxH;
+//			printRect(child, (int)(left + parent.nodeW + dp24), lastY);
+//		}
 	}
 }
