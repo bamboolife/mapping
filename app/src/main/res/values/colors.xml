@@ -10,5 +10,8 @@
     <color name="transparent">#00000000</color>
     <color name="color_A9A9A9">#A9A9A9</color>
     <color name="color_FFFFFF">#ffffff</color>
+    <color name="color_F9F9F9">#F9F9F9</color>
+    <color name="color_D7D7D7">#D7D7D7</color>
     <color name="color_000000">#000000</color>
+    <color name="color_88BFBD">#88BFBD</color>
 </resources>

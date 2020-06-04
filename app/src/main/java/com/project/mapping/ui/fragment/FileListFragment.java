@@ -94,9 +94,10 @@ public class FileListFragment extends BaseFragment implements View.OnClickListen
         inputMethodManager = (InputMethodManager) getActivity().getApplicationContext().
                 getSystemService(Context.INPUT_METHOD_SERVICE);
         mRvList = view.findViewById(R.id.rv_list);
-        mBtnAdd = view.findViewById(R.id.btn_add);
+        mBtnAdd = view.findViewById(R.id.tb_right_btn);
         Toolbar mTitle = view.findViewById(R.id.tb_head);
 
+        mBtnAdd.setVisibility(View.VISIBLE);
         mBtnAdd.setOnClickListener(this);
         fileAdapter = new FileAdapter();
         mRvList.setAdapter(fileAdapter);
@@ -208,7 +209,7 @@ public class FileListFragment extends BaseFragment implements View.OnClickListen
         etCreate = view.findViewById(R.id.et_create);
         if (titleType == 0) {
             tvCreate.setText("新建文件夹");
-            etCreate.setHint("输入标题");
+            etCreate.setHint("未命名");
         } else {
             etCreate.setHint("输入文件名");
             tvCreate.setText("文件重命名");
@@ -301,7 +302,7 @@ public class FileListFragment extends BaseFragment implements View.OnClickListen
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_add:
+            case R.id.tb_right_btn:
                 showDirPop(0);
                 break;
             default:

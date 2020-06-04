@@ -11,6 +11,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.project.mapping.MappingApplication;
@@ -93,34 +94,36 @@ public class TreeView extends ViewGroup {
             }
         });
         setTreeLayoutManager(new TreeLayoutManager(this));
-	}
+    }
 
     public void initMapping(TreeModel<String> data) {
         if (null == data) {
             MappingApplication.isRandom = false;
-            NodeModel<String> nm	= new NodeModel<>("");
-            nm.level				= TreeConstant.LEVEL_0;
-            nm.lineColor			= Color.rgb(117, 148, 230);
-            data	= new TreeModel<>(nm);
-        }else{
+            NodeModel<String> nm = new NodeModel<>("");
+            nm.level = TreeConstant.LEVEL_0;
+            nm.lineColor = Color.rgb(117, 148, 230);
+            data = new TreeModel<>(nm);
+        } else {
             MappingApplication.isRandom = true;
         }
         this.setTreeModel(data);
+        setScale(1);
 //        KeyboardUtils.showInput(this, nv.et);
     }
 
     public void setScale(float newScale) {
-        if      (newScale < .2) scale = .2f;
+        if (newScale < .2) scale = .2f;
         else if (newScale > 1000) scale = 1000;
-        else                    scale = newScale;
+        else scale = newScale;
 
         if (mCurrentFocus != null)
             findNodeViewFromNodeModel(mCurrentFocus).clearFocus();
-            mCurrentFocus   = null;
+        mCurrentFocus = null;
         mTreeLayoutManager.onTreeLayout();
     }
 
     int movingleft, movingtop;
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -128,8 +131,8 @@ public class TreeView extends ViewGroup {
         for (int i = 0; i < size; i++) {
             measureChild(getChildAt(i), widthMeasureSpec, heightMeasureSpec);
         }
-        movingtop     = this.getTop();
-        movingleft    = this.getLeft();
+        movingtop = this.getTop();
+        movingleft = this.getLeft();
         Log.e(TAG + " onMeasure", this.getLeft() + "  ");
     }
 
@@ -256,11 +259,11 @@ public class TreeView extends ViewGroup {
 
     //TODO
     private void setLine(View from, View to, Canvas c) {
-        float padB  = scaleDp2px(8);
+        float padB = scaleDp2px(8);
         float formX = from.getRight();
-        float toX   = to.getLeft();
+        float toX = to.getLeft();
         float formY = (from.getBottom() - padB);
-        float toY   = (to  .getBottom() - padB);
+        float toY = (to.getBottom() - padB);
         float dLine = scaleDp2px(4);
 
         mPath.reset();
@@ -302,12 +305,12 @@ public class TreeView extends ViewGroup {
         }
     }
 
-	public TreeModel<String> getTreeModel() {
+    public TreeModel<String> getTreeModel() {
         return mTreeModel;
     }
 
     public void setTreeModel(TreeModel<String> treeModel) {
-        Log.e(TAG, "setTreeModel "+treeModel.getRootNode().strContent);
+        Log.e(TAG, "setTreeModel " + treeModel.getRootNode().strContent);
         mTreeModel = treeModel;
 
         clearAllNoteViews();
@@ -354,7 +357,7 @@ public class TreeView extends ViewGroup {
     }
 
     private void addNodeViewToGroup(NodeModel<String> poll) {
-        Log.w("addNodeViewToGroup","..." + poll.level);
+        Log.w("addNodeViewToGroup", "..." + poll.level);
         final NodeView nodeView = new NodeView(ctx);
         nodeView.setFocusable(true);
         nodeView.setClickable(true);
@@ -376,7 +379,7 @@ public class TreeView extends ViewGroup {
             @Override
             public void focusChange(boolean b, NodeModel<String> nm) {
                 mCurrentFocus = nm;
-                Log.e(TAG, "focusChange: "+ b + "  " + nm.strContent);
+                Log.e(TAG, "focusChange: " + b + "  " + nm.strContent);
             }
         });
         nodeView.setOnLongClickListener(new OnLongClickListener() {
@@ -396,12 +399,12 @@ public class TreeView extends ViewGroup {
         this.post(() -> {
             int w = TreeView.this.getMeasuredWidth();
             int h = TreeView.this.getMeasuredHeight();
-            Log.w(TAG, "setNodeFocus" + w + "  " + h );
+            Log.w(TAG, "setNodeFocus" + w + "  " + h);
 
-            if (node.getLeft() < - TreeView.this.getLeft() || node.getRight() > w - TreeView.this.getLeft()) {
+            if (node.getLeft() < -TreeView.this.getLeft() || node.getRight() > w - TreeView.this.getLeft()) {
                 TreeView.this.setLeft((w - node.getMeasuredWidth()) / 2 - node.getLeft());
             }
-            if (node.getTop()  < - TreeView.this.getTop() || node.getBottom() > h - TreeView.this.getTop()) {
+            if (node.getTop() < -TreeView.this.getTop() || node.getBottom() > h - TreeView.this.getTop()) {
                 TreeView.this.setTop((h - node.getMeasuredHeight()) / 2 - node.getTop());
             }
         });
@@ -440,9 +443,19 @@ public class TreeView extends ViewGroup {
 //        }
 //TODO
         nodeModel.setFocus(true);
-        findNodeViewFromNodeModel(nodeModel).setSelected(true);
+//        findNodeViewFromNodeModel(nodeModel).setSelected(true);
+        NodeView nodeView = findNodeViewFromNodeModel(nodeModel);
+        nodeView.requestFocus();
+
         mCurrentFocus = nodeModel;
-        System.out.println("hasFocus----  11111111111");
+        showSoftWare(nodeView);
+    }
+
+    public void showSoftWare(View nodeView) {
+        InputMethodManager imm = (InputMethodManager) MappingApplication.mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(nodeView, InputMethodManager.SHOW_FORCED);
+
+        imm.hideSoftInputFromWindow(nodeView.getWindowToken(), 0);
     }
 
     /**
@@ -452,7 +465,7 @@ public class TreeView extends ViewGroup {
      */
     public void setTreeLayoutManager(TreeLayoutManager treeLayoutManager) {
         mTreeLayoutManager = treeLayoutManager;
-        Log.e(TAG, "mTreeLayoutManager is null : "+ (mTreeLayoutManager == null));
+        Log.e(TAG, "mTreeLayoutManager is null : " + (mTreeLayoutManager == null));
     }
 
     /**
@@ -495,7 +508,7 @@ public class TreeView extends ViewGroup {
     }
 
     public void addNode(String nodeValue, int index) {
-        if (getCurrentFocusNode() == null || index==0) return;
+        if (getCurrentFocusNode() == null || index == 0) return;
 
         NodeModel<String> addNode = new NodeModel<>(nodeValue);
         NodeModel<String> parentNode = getCurrentFocusNode().getParentNode();
@@ -555,7 +568,7 @@ public class TreeView extends ViewGroup {
         addNodeViewToGroup(addNode);
     }
 
-    public void addSubNode(NodeModel<String> parent,String nodeValue) {
+    public void addSubNode(NodeModel<String> parent, String nodeValue) {
         NodeModel<String> addNode = new NodeModel<>(nodeValue);
 
         addNode.leftLineColor = parent.lineColor;
@@ -577,7 +590,8 @@ public class TreeView extends ViewGroup {
         mTreeModel.addNode(parent, addNode);
         addNodeViewToGroup(addNode);
     }
-    public void addSubNode(NodeModel<String> parent,NodeModel<String> addNode) {
+
+    public void addSubNode(NodeModel<String> parent, NodeModel<String> addNode) {
         addNode.leftLineColor = parent.lineColor;
         if (mTreeModel != null) {
             if (mTreeModel.getRootNode() != parent) {
@@ -601,6 +615,7 @@ public class TreeView extends ViewGroup {
     public void deleteNode(NodeModel<String> node) {
         if (node == null) return;
 
+
         //设置current的选择
 
         NodeModel<String> parentNode = node.getParentNode();
@@ -622,6 +637,8 @@ public class TreeView extends ViewGroup {
                 queue.add(nm);
             }
         }
+
+
     }
 
     public int getTreeNodeIndex(NodeModel<String> node) {

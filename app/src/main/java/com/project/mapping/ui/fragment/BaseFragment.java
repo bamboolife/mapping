@@ -15,7 +15,7 @@ import com.trello.rxlifecycle2.components.support.RxFragment;
 
 public class BaseFragment extends RxFragment implements View.OnTouchListener {
 
-    private Toolbar mTbHead;
+    protected Toolbar mTbHead;
 
     @Nullable
     @Override
@@ -28,6 +28,7 @@ public class BaseFragment extends RxFragment implements View.OnTouchListener {
         super.onViewCreated(view, savedInstanceState);
         view.setOnTouchListener(this);
         mTbHead = (Toolbar) getActivity().findViewById(R.id.tb_head);
+
         mTbHead.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -141,29 +141,29 @@ public class PayFragment extends BaseFragment {
             }
         });
 
-        view.findViewById(R.id.btn_forever).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isLogin = SPUtil.getBoolean(Constant.LOGIN, false);
-                Map<String, String> map = new HashMap<>();
-                map.put(Constant.ORDERTYPE, "2");
-                map.put(Constant.EQUIPMENT_ID, DeviceUtil.getDeviceId(getActivity()));
-                RetrofitManager.getInstance().getService().postUnifiedOrder(map).
-                        compose(Transformers.applySchedulers(PayFragment.this, FragmentEvent.DESTROY)).
-                        subscribe(payBean -> {
-                            Log.d("===pay=2==", payBean.toString());
-                            if (payBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
-                                PayBean.DataBean payBeanData = payBean.getData();
-                                startWx(payBeanData.getAppid(),
-                                        payBeanData.getPartnerid(),
-                                        payBeanData.getPrepayid(),
-                                        payBeanData.getPackageX(),
-                                        payBeanData.getNoncestr(),
-                                        payBeanData.getTimestamp(),
-                                        payBeanData.getSign());
-                            }
-                        });
-            }
-        });
+//        view.findViewById(R.id.btn_forever).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                isLogin = SPUtil.getBoolean(Constant.LOGIN, false);
+//                Map<String, String> map = new HashMap<>();
+//                map.put(Constant.ORDERTYPE, "2");
+//                map.put(Constant.EQUIPMENT_ID, DeviceUtil.getDeviceId(getActivity()));
+//                RetrofitManager.getInstance().getService().postUnifiedOrder(map).
+//                        compose(Transformers.applySchedulers(PayFragment.this, FragmentEvent.DESTROY)).
+//                        subscribe(payBean -> {
+//                            Log.d("===pay=2==", payBean.toString());
+//                            if (payBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
+//                                PayBean.DataBean payBeanData = payBean.getData();
+//                                startWx(payBeanData.getAppid(),
+//                                        payBeanData.getPartnerid(),
+//                                        payBeanData.getPrepayid(),
+//                                        payBeanData.getPackageX(),
+//                                        payBeanData.getNoncestr(),
+//                                        payBeanData.getTimestamp(),
+//                                        payBeanData.getSign());
+//                            }
+//                        });
+//            }
+//        });
     }
 }

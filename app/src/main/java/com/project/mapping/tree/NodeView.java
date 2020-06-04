@@ -153,19 +153,19 @@ public class NodeView extends FrameLayout {
                 break;
             case TreeConstant.LEVEL_1:
                 et.setTextSize(15);
-                lp.height = DensityUtils.dp2px(getContext(), 2.5f);
+                lp.height = DensityUtils.dp2px(getContext(), 3.3f);
                 break;
             case TreeConstant.LEVEL_2:
-                et.setTextSize(12);
-                lp.height = DensityUtils.dp2px(getContext(), 1.33f);
+                et.setTextSize(15);
+                lp.height = DensityUtils.dp2px(getContext(), 2.33f);
                 break;
             case TreeConstant.LEVEL_3:
-                et.setTextSize(12);
-                lp.height = DensityUtils.dp2px(getContext(), 0.75f);
+                et.setTextSize(15);
+                lp.height = DensityUtils.dp2px(getContext(), 1.83f);
                 break;
             default:
-                et.setTextSize(12);
-                lp.height = DensityUtils.dp2px(getContext(), 0.75f);
+                et.setTextSize(15);
+                lp.height = DensityUtils.dp2px(getContext(), 1.83f);
         }
         line.setLayoutParams(lp);
     }

@@ -22,6 +22,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:padding="4dp"
+        android:visibility="gone"
         android:background="@drawable/top_circle"
         android:gravity="center_horizontal"
         android:layout_marginEnd="30dp"

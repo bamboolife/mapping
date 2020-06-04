@@ -31,6 +31,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.project.mapping.bean.DataBean;
 import com.project.mapping.bean.FileTypeBean;
@@ -43,6 +45,7 @@ import com.project.mapping.ui.fragment.BaseFragment;
 import com.project.mapping.ui.fragment.FileListFragment;
 import com.project.mapping.ui.fragment.LoginFragment;
 import com.project.mapping.ui.fragment.PayFragment;
+import com.project.mapping.ui.fragment.SnapPreviewFragment;
 import com.project.mapping.ui.fragment.SuggestionFragment;
 import com.project.mapping.util.DensityUtils;
 import com.project.mapping.util.DeviceUtil;
@@ -51,6 +54,7 @@ import com.project.mapping.util.FileUtils;
 import com.project.mapping.util.ImageUtils;
 import com.project.mapping.util.RetrofitManager;
 import com.project.mapping.util.SPUtil;
+import com.project.mapping.util.ScreenUtils;
 import com.project.mapping.util.SoftKeyBoardListener;
 import com.project.mapping.util.ToastUtil;
 import com.project.mapping.util.rx.Transformers;
@@ -78,7 +82,8 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     ImageView mIvDrawerOpen;
     NavigationView mNvMenuRight;
     DrawerLayout mIdDrawerLayout;
-    private PopupWindow mPopupWindow;
+//    private PopupWindow mPopupWindow;
+    private BottomSheetDialog mBottomDialog;
     private boolean mIsLogin;
     /**
      * 用户账号为手机号码后四位
@@ -198,8 +203,19 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 llBottomBtn.setVisibility(View.GONE);
             }
         });
+        initPopView();
     }
 
+
+    private void initPopView(){
+        view = View.inflate(this, R.layout.pop_share, null);
+
+        mBottomDialog=new BottomSheetDialog(this);
+        mBottomDialog.setContentView(view);
+        mBottomDialog.setCanceledOnTouchOutside(true);
+        mBottomDialog.getBehavior().setPeekHeight((int) (ScreenUtils.getScreenHeight(MappingApplication.mContext)/2.5));
+
+    }
     /**
      * initListener
      */
@@ -292,13 +308,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         mDirPopup.setFocusable(true);
         mDirPopup.setOutsideTouchable(true);
         mDirPopup.showAtLocation(view, Gravity.CENTER, 0, 0);
-        popOutShadow(0.7f);
-        mDirPopup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                popOutShadow(1);
-            }
-        });
+
         view.findViewById(R.id.btn_confirm).setOnClickListener(view1 -> {
             if (TextUtils.isEmpty(etCreate.getText().toString().trim())) {
                 ToastUtil.showToast("请输入文件名", this);
@@ -378,6 +388,15 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         }
     }
 
+    /**
+     * 获取treeView 的bitmap
+     *
+     * @return
+     */
+    public Bitmap getTreeViewBitmap() {
+        return ImageUtils.generateBitmap(treeV);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         mIdDrawerLayout.closeDrawers();
@@ -408,7 +427,9 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 });
                 break;
             case R.id.import_image:
-                ImageUtils.importImage(treeV, this, true, ImageUtils.SD_PATH);
+//                ImageUtils.importImage(treeV, this, true, ImageUtils.SD_PATH);
+                replaceFragment(new SnapPreviewFragment());
+
                 break;
             case R.id.suggestion:
                 replaceFragment(new SuggestionFragment());
@@ -451,11 +472,14 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
      */
     public void imageShare(int shareType) {
         String imagePath = ImageUtils.getImagePath();
-        Log.d("==imagePath==", imagePath);
-        if (imagePath.equals(null)) {
-            ToastUtil.showToast("图片不存在", this);
-            return;
+        if (imagePath == null) {
+//            ToastUtil.showToast("图片不存在", this);
+            ImageUtils.importImage(treeV, MainActivity.this, false, ImageUtils.SD_PATH);
+            imagePath = ImageUtils.getImagePath();
+
         }
+        Log.d("==imagePath==", imagePath);
+
 
         Bitmap bmp = BitmapFactory.decodeFile(imagePath);
         WXImageObject imgObj = new WXImageObject(bmp);
@@ -472,40 +496,28 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         wxapi.sendReq(req);
     }
 
-    private void showSharePop() {
-        View view = View.inflate(this, R.layout.pop_share, null);
-        mPopupWindow = new PopupWindow(view,
-                ViewGroup.LayoutParams.MATCH_PARENT, DensityUtils.dp2px(this,160));
-        mPopupWindow.setBackgroundDrawable(new BitmapDrawable());
-        mPopupWindow.setFocusable(true);
-        mPopupWindow.setOutsideTouchable(true);
-        mPopupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
-        popOutShadow(0.7f);
+    private View view;
+
+    public void showSharePop() {
+
+        mBottomDialog.show();
         initPopListener(view);
     }
 
-    /**
-     * 让popupwindow以外区域阴影显示
-     *
-     * @param alpha
-     */
-    private void popOutShadow(float alpha) {
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.alpha = alpha; //0.0-1.0
-        getWindow().setAttributes(lp);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+    public void setSaveToSD(int visible) {
+        if (null == view) {
+            return;
+        }
+        view.findViewById(R.id.ll_save).setVisibility(visible);
     }
 
+
     private void initPopListener(View view) {
-        mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                popOutShadow(1.0f);
-            }
-        });
+
         TextView tvCancel = view.findViewById(R.id.tv_cancel);
         LinearLayout llFriends = view.findViewById(R.id.ll_friends);
         LinearLayout llMoments = view.findViewById(R.id.ll_moments);
+        LinearLayout llSave = view.findViewById(R.id.ll_save);
         tvCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -526,11 +538,18 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 imageShare(0);
             }
         });
+        llSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popDismiss();
+                ImageUtils.importImage(treeV, MainActivity.this, true, ImageUtils.SD_PATH);
+            }
+        });
     }
 
     private void popDismiss() {
-        if (mPopupWindow != null) {
-            mPopupWindow.dismiss();
+        if (mBottomDialog != null) {
+            mBottomDialog.dismiss();
         }
     }
 
