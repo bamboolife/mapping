@@ -45,6 +45,7 @@ import com.project.mapping.ui.fragment.BaseFragment;
 import com.project.mapping.ui.fragment.FileListFragment;
 import com.project.mapping.ui.fragment.LoginFragment;
 import com.project.mapping.ui.fragment.PayFragment;
+import com.project.mapping.ui.fragment.PrivacyDialogFragment;
 import com.project.mapping.ui.fragment.SnapPreviewFragment;
 import com.project.mapping.ui.fragment.SuggestionFragment;
 import com.project.mapping.util.DensityUtils;
@@ -82,7 +83,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     ImageView mIvDrawerOpen;
     NavigationView mNvMenuRight;
     DrawerLayout mIdDrawerLayout;
-//    private PopupWindow mPopupWindow;
+    //    private PopupWindow mPopupWindow;
     private BottomSheetDialog mBottomDialog;
     private boolean mIsLogin;
     /**
@@ -115,7 +116,9 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         treeV = (TreeView) ((ViewGroup) findViewById(R.id.msv)).getChildAt(0);
         treeV.initMapping(null);
         applyPermission();
-
+        if (SPUtil.getInt("user_privacy", 0)!=1) {
+            showUserPrivacy();
+        }
 //        getWindow().setStatusBarColor(Color.TRANSPARENT);
 //        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
@@ -125,6 +128,11 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         } else if (SPUtil.getString("EditorMapPath", null) != null) {
             read(SPUtil.getString("EditorMapPath", null));
         }
+    }
+
+    private void showUserPrivacy() {
+        PrivacyDialogFragment privacyDialogFragment = new PrivacyDialogFragment();
+        privacyDialogFragment.show(getSupportFragmentManager(), "privacy");
     }
 
     private void applyPermission() {
@@ -207,15 +215,16 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
 
-    private void initPopView(){
+    private void initPopView() {
         view = View.inflate(this, R.layout.pop_share, null);
 
-        mBottomDialog=new BottomSheetDialog(this);
+        mBottomDialog = new BottomSheetDialog(this);
         mBottomDialog.setContentView(view);
         mBottomDialog.setCanceledOnTouchOutside(true);
-        mBottomDialog.getBehavior().setPeekHeight((int) (ScreenUtils.getScreenHeight(MappingApplication.mContext)/2.5));
+        mBottomDialog.getBehavior().setPeekHeight((int) (ScreenUtils.getScreenHeight(MappingApplication.mContext) / 2.5));
 
     }
+
     /**
      * initListener
      */
