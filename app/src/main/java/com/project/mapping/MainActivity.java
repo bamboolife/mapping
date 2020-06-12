@@ -3,6 +3,7 @@ package com.project.mapping;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.project.mapping.bean.DataBean;
 import com.project.mapping.bean.FileTypeBean;
+import com.project.mapping.bean.PayBean;
 import com.project.mapping.constant.Constant;
 import com.project.mapping.tree.TreeUtils;
 import com.project.mapping.tree.TreeView;
@@ -62,9 +64,11 @@ import com.project.mapping.util.rx.Transformers;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXImageObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.trello.rxlifecycle2.android.ActivityEvent;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 import java.io.File;
@@ -116,7 +120,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         treeV = (TreeView) ((ViewGroup) findViewById(R.id.msv)).getChildAt(0);
         treeV.initMapping(null);
         applyPermission();
-        if (SPUtil.getInt("user_privacy", 0)!=1) {
+        if (SPUtil.getInt("user_privacy", 0) != 1) {
             showUserPrivacy();
         }
 //        getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -131,7 +135,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void showUserPrivacy() {
-        PrivacyDialogFragment privacyDialogFragment = new PrivacyDialogFragment();
+        PrivacyDialogFragment privacyDialogFragment = new PrivacyDialogFragment(this);
         privacyDialogFragment.show(getSupportFragmentManager(), "privacy");
     }
 
@@ -362,7 +366,8 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     ToastUtil.showToast("当前无内容无法保存", this);
                 }
             } else {
-                showDirPop(this, fileName.replaceFirst("[.]+", ""), cb);
+                showNotSaveDialog(fileName.replaceFirst("[.]+", ""), cb);
+//                showDirPop(this, fileName.replaceFirst("[.]+", ""), cb);
             }
             isSave = false;
             isJumpFileList = false;
@@ -393,8 +398,91 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 }
             });
         } else {
-            ToastUtil.showToast("保存失败，免费版最多只能保存4个", MainActivity.this);
+            if (isShowToast) {
+                showSaveMoreDialog();
+            }
+//            ToastUtil.showToast("保存失败，免费版最多只能保存4个", MainActivity.this);
         }
+    }
+
+    private void showNotSaveDialog(String title, Callback cb) {
+        Dialog dialog = new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前文件尚未保存")
+                .setPositiveButton("保存并新建", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        saveMap("" + title, true);
+                        if (cb != null) {
+                            cb.onSuccesed(null);
+                        }
+                    }
+                })
+                .setNegativeButton("直接新建", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        newMap();
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    private void showSaveMoreDialog() {
+        Dialog dialog = new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前创建文件数已达上限，请升级权益")
+                .setPositiveButton("9.9/年", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        pay();
+
+                    }
+                })
+                .setNegativeButton("查看详情", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        replaceFragment(new PayFragment());
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    private void pay() {
+        Map<String, String> map = new HashMap<>();
+        map.put(Constant.ORDERTYPE, "1");
+        map.put(Constant.EQUIPMENT_ID, DeviceUtil.getDeviceId(this));
+        RetrofitManager.getInstance().getService().postUnifiedOrder(map).
+                compose(Transformers.applySchedulers(this, ActivityEvent.DESTROY))
+                .subscribe(payBean -> {
+                    Log.d("===pay=1==", payBean.toString());
+                    if (payBean.getStatus().equals(Constant.BIZ_SUCCESS)) {
+                        PayBean.DataBean payBeanData = payBean.getData();
+                        startWx(payBeanData.getAppid(),
+                                payBeanData.getPartnerid(),
+                                payBeanData.getPrepayid(),
+                                payBeanData.getPackageX(),
+                                payBeanData.getNoncestr(),
+                                payBeanData.getTimestamp(),
+                                payBeanData.getSign());
+                    }
+                });
+    }
+
+    private void startWx(String appid, String partnerid, String prepayid, String packageX, String noncestr, String timestamp, String sign) {
+        IWXAPI iwxapi = WXAPIFactory.createWXAPI(this, Constant.WEHCHAT_APPID);
+        PayReq request = new PayReq();
+        request.appId = appid;
+        request.partnerId = partnerid;
+        request.prepayId = prepayid;
+        request.packageValue = packageX;
+        request.nonceStr = noncestr;
+        request.timeStamp = timestamp;
+        request.sign = sign;
+        iwxapi.sendReq(request);
     }
 
     /**
@@ -448,8 +536,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 saveTempMap(new Callback() {
                     @Override
                     public void onSuccesed(String msg) {
-                        treeV.initMapping(null);
-                        path = null;
+                        newMap();
                     }
 
                     @Override
@@ -472,6 +559,14 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 
         }
         return false;
+    }
+
+    /**
+     * 新建map
+     */
+    private void newMap() {
+        treeV.initMapping(null);
+        path = null;
     }
 
     /**

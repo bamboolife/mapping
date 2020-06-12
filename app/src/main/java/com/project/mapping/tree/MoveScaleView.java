@@ -64,6 +64,8 @@ public class MoveScaleView extends ViewGroup implements ScaleGestureDetector.OnS
 	}
 	@Override
 	public boolean performClick() {
+		tree.setScale(1);
+//		tree.setCurrentSelectedNode(tree.getCurrentFocusNode());
 		return super.performClick();
 	}
 
@@ -190,5 +192,6 @@ public class MoveScaleView extends ViewGroup implements ScaleGestureDetector.OnS
 	@Override
 	public void onScaleEnd(ScaleGestureDetector detector) {
 		Log.e(TAG, "MotionEvent.onScaleEnd  ");
+
 	}
 }

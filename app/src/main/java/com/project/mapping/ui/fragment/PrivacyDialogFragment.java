@@ -26,6 +26,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.project.mapping.MainActivity;
 import com.project.mapping.R;
+import com.project.mapping.ui.activity.PrivacyActivity;
 import com.project.mapping.util.SPUtil;
 import com.project.mapping.util.ToastUtil;
 
@@ -63,12 +64,12 @@ public class PrivacyDialogFragment extends DialogFragment {
         spannableString.setSpan(new UnderlineSpan(), 8, 12, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         spannableString.setSpan(new UnderlineSpan(), 13, 16, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
 
-        Intent intent = new Intent();
-
+        Intent intent = new Intent(mainActivity, PrivacyActivity.class);
         spannableString.setSpan(new ClickableSpan() {
             @Override
             public void onClick(@NonNull View view) {
-
+                intent.putExtra("tab",0);
+                startActivity(intent);
             }
 
             @Override
@@ -80,6 +81,8 @@ public class PrivacyDialogFragment extends DialogFragment {
         spannableString.setSpan(new ClickableSpan() {
             @Override
             public void onClick(@NonNull View view) {
+                intent.putExtra("tab",1);
+                startActivity(intent);
             }
 
             @Override

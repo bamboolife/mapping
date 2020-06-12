@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.media.MediaScannerConnection;
 import android.text.TextUtils;
 import android.util.Log;
@@ -50,12 +52,22 @@ public class ImageUtils {
         final float cacheScale = tree.scale;
         final float scale = 2f / DensityUtils.dp2px(tree.getContext(), 1);
         tree.setScale(scale);
+        int offset = DensityUtils.dp2px(MappingApplication.mContext, 60);
+        int w = (int) (rootNode.boxW + DensityUtils.dp2px(MappingApplication.mContext, 60));
+        int h = (int) (rootNode.boxH + DensityUtils.dp2px(MappingApplication.mContext, 60));
+        Matrix matrix = new Matrix();
+
         Bitmap bitmap = Bitmap.createBitmap(
-                (int) (rootNode.boxW + DensityUtils.dp2px(MappingApplication.mContext, 60)),
-                (int) ((rootNode.boxH + DensityUtils.dp2px(MappingApplication.mContext, 60))),
+                w,
+                h,
                 Bitmap.Config.RGB_565);
 
+        Point center = new Point(w / 2, w / 2);
+        Point  bmpCenter = new Point(bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+        matrix.postTranslate(center.x - bmpCenter.x, center.y - bmpCenter.y); // 移动到当前view 的中心
+
         Canvas c = new Canvas(bitmap);
+
         c.drawColor(Color.WHITE);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.BLUE);
