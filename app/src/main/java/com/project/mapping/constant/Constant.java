@@ -38,7 +38,7 @@ public interface Constant {
      */
     String VERIFICATION_CODE = "verificationCode";
     String WEHCHAT_APPID = "wx3922c854984be505";
-    String IMAGE_WATERMARK = "--番茄思维导图";
+    String IMAGE_WATERMARK = "Powered by 番茄思维导图";
     /**
      * 导图存放根目录
      */

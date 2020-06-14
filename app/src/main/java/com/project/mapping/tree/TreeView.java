@@ -142,6 +142,7 @@ public class TreeView extends ViewGroup {
         if (mTreeLayoutManager != null && mTreeModel != null) {
             setLeft(movingleft);
             setTop(movingtop);
+
             mTreeLayoutManager.onTreeLayout();
         }
     }

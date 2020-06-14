@@ -10,8 +10,10 @@ import android.graphics.Point;
 import android.media.MediaScannerConnection;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 
 import com.project.mapping.MappingApplication;
+import com.project.mapping.R;
 import com.project.mapping.constant.Constant;
 import com.project.mapping.tree.TreeView;
 import com.project.mapping.tree.model.NodeModel;
@@ -57,26 +59,39 @@ public class ImageUtils {
         int h = (int) (rootNode.boxH + DensityUtils.dp2px(MappingApplication.mContext, 60));
         Matrix matrix = new Matrix();
 
+
+//        tree.setDrawingCacheEnabled(true);
+//        //measure()实际测量 自己显示在屏幕上的宽高 2个参数，int widthMeasureSpec 和 int heightMeasureSpec表示具体的测量规则。
+//        tree.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+//                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        //确定View的大小和位置的,然后将其绘制出来
+//        tree.layout(150, 150, tree.getMeasuredWidth(), tree.getMeasuredHeight());
+        //调用getDrawingCache方法就可 以获得view的cache图片
+
+
+//        Bitmap bitmap = Bitmap.createBitmap(tree.getDrawingCache());
         Bitmap bitmap = Bitmap.createBitmap(
                 w,
                 h,
                 Bitmap.Config.RGB_565);
 
         Point center = new Point(w / 2, w / 2);
-        Point  bmpCenter = new Point(bitmap.getWidth() / 2, bitmap.getHeight() / 2);
-        matrix.postTranslate(center.x - bmpCenter.x, center.y - bmpCenter.y); // 移动到当前view 的中心
+        Point bmpCenter = new Point(bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+//        matrix.postTranslate(center.x - bmpCenter.x, center.y - bmpCenter.y); // 移动到当前view 的中心
 
         Canvas c = new Canvas(bitmap);
 
         c.drawColor(Color.WHITE);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.BLUE);
+        paint.setColor(tree.getContext().getResources().getColor(R.color.color_8666f1));
         paint.setTextSize(25 * scale);
         c.drawText(
                 Constant.IMAGE_WATERMARK,
-                bitmap.getWidth() - DensityUtils.dp2px(MappingApplication.mContext, 80 * scale),
-                bitmap.getHeight() - DensityUtils.dp2px(MappingApplication.mContext, 20 * scale),
+                bmpCenter.x - DensityUtils.dp2px(MappingApplication.mContext, 60),
+                bitmap.getHeight() - DensityUtils.dp2px(MappingApplication.mContext, 10),
                 paint);
+
+//        c.drawBitmap(bitmap, matrix, paint);
         tree.draw(c);
         c.save();
         tree.setScale(cacheScale);

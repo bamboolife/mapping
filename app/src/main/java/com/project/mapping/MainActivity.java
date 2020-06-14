@@ -30,6 +30,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -111,6 +113,10 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private boolean isJumpFileList = false;
     private boolean isSave = false;
 
+    private String[] perms = {Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE};
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,8 +129,6 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         if (SPUtil.getInt("user_privacy", 0) != 1) {
             showUserPrivacy();
         }
-//        getWindow().setStatusBarColor(Color.TRANSPARENT);
-//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
         if (savedInstanceState != null) {
             String mapPath = savedInstanceState.getString("EditorMapPath");
@@ -140,14 +144,12 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void applyPermission() {
-        String[] perms = {Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE};
+
         if (Build.VERSION.SDK_INT >= 23) {
             if (EasyPermissions.hasPermissions(this, perms)) {
                 init();
             } else {
-                EasyPermissions.requestPermissions(this, "您需要打开存储空间和电话权限才可以使用app", 0, perms);
+                ActivityCompat.requestPermissions(this, perms, 100);
             }
         } else {
             init();
@@ -156,7 +158,6 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 
     private void init() {
         initData();
-        initListener();
         initWeChat();
     }
 
@@ -216,6 +217,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
             }
         });
         initPopView();
+        initListener();
     }
 
 
@@ -347,7 +349,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         });
     }
 
-    private void saveTempMap(Callback cb) {
+    private void saveTempMap(Callback cb,boolean showDialog) {
         Log.e(TAG, "saveTempMap: " + path);
         if (null == path || path.endsWith(".temp.mapping")) {
             NodeModel root = treeV.getTreeModel().getRootNode();
@@ -363,10 +365,14 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     }
                 }
                 if (isSave) {
-                    ToastUtil.showToast("当前无内容无法保存", this);
+                    ToastUtil.showToast("当前无新内容，无需保存", this);
                 }
             } else {
-                showNotSaveDialog(fileName.replaceFirst("[.]+", ""), cb);
+                if (showDialog) {
+                    showNotSaveDialog(fileName.replaceFirst("[.]+", ""), cb);
+                }else{
+                    saveMap(fileName.replaceFirst("[.]+", ""), true);
+                }
 //                showDirPop(this, fileName.replaceFirst("[.]+", ""), cb);
             }
             isSave = false;
@@ -496,6 +502,11 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        if (!EasyPermissions.hasPermissions(this, perms)) {
+
+            applyPermission();
+            return true;
+        }
         mIdDrawerLayout.closeDrawers();
         switch (menuItem.getItemId()) {
             case R.id.pay:
@@ -507,10 +518,11 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.save:
                 isSave = true;
-                saveTempMap(null);
+                saveTempMap(null,false);
                 break;
             case R.id.file_list:
                 isJumpFileList = true;
+
                 saveTempMap(new Callback() {
                     @Override
                     public void onSuccesed(String msg) {
@@ -521,7 +533,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     public void onFail(String msg) {
                         isJumpFileList = false;
                     }
-                });
+                },false);
                 break;
             case R.id.import_image:
 //                ImageUtils.importImage(treeV, this, true, ImageUtils.SD_PATH);
@@ -544,7 +556,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 //                        treeV.initMapping(null);
 //                        path = null;
                     }
-                });
+                },true);
 //				treeV.initMapping(null);
 //				path = null;
                 break;
@@ -662,11 +674,22 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
             mIdDrawerLayout.closeDrawers();
             mIdDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fl_content, baseFragment)
-                .addToBackStack(null)
-                .commit();
+        if(baseFragment instanceof SnapPreviewFragment){
+            getSupportFragmentManager()
+
+                    .beginTransaction()
+                    .setCustomAnimations(R.anim.up_down_slide,0,R.anim.up_down_slide,0)
+                    .replace(R.id.fl_content, baseFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }else {
+            getSupportFragmentManager()
+
+                    .beginTransaction()
+                    .replace(R.id.fl_content, baseFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
 
@@ -711,26 +734,28 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 
     @Override
     public void onPermissionsDenied(int requestCode, List<String> perms) {
-        ToastUtil.showToast("已拒绝获取电话或存储空间权限并不再询问", this);
+        ToastUtil.showToast("已拒绝获取电话或存储空间权限,会影响您的使用", this);
 //        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-        new AlertDialog
-                .Builder(this).setMessage("此功能需要电话和存储空间权限，否则无法正常使用，是否打开设置").setCancelable(false)
-                .setPositiveButton("是", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        gotoAppDetailIntent(MainActivity.this);
-                        finish();
-                    }
-                })
-                .setNegativeButton("否", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        ToastUtil.showToast("权限不足，退出软件", MainActivity.this);
-                        finish();
-                    }
-                })
-                .show();
+
+
+//        new AlertDialog
+//                .Builder(this).setMessage("此功能需要电话和存储空间权限，否则无法正常使用，是否打开设置").setCancelable(false)
+//                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.dismiss();
+//                        gotoAppDetailIntent(MainActivity.this);
+//                        finish();
+//                    }
+//                })
+//                .setNegativeButton("否", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        ToastUtil.showToast("权限不足，退出软件", MainActivity.this);
+//                        finish();
+//                    }
+//                })
+//                .show();
 
 //        } else {
 //            finish();

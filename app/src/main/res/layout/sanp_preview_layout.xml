@@ -28,7 +28,7 @@
             android:gravity="center"
             android:paddingRight="10dp"
             android:text="返回"
-            android:textColor="@color/color_88BFBD"
+            android:textColor="@color/color_8666f1"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,10 +38,10 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="导出快照"
+            android:text="导出预览"
 
             android:textColor="@color/color_000000"
-            android:textSize="24sp"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
 
             app:layout_constraintEnd_toStartOf="@+id/snap_btn_export"
@@ -55,7 +55,7 @@
             android:layout_marginEnd="10dp"
             android:gravity="center"
             android:text="导出"
-            android:textColor="@color/color_88BFBD"
+            android:textColor="@color/color_8666f1"
             android:textSize="17sp"
             app:layout_constraintBottom_toBottomOf="parent"
 
