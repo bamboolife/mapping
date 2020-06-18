@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.icu.util.Measure;
 import android.media.MediaScannerConnection;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +21,7 @@ import com.project.mapping.tree.model.NodeModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.LinkedList;
 
 /**
  * Created by lin.woo on 2020/4/13.
@@ -48,50 +50,45 @@ public class ImageUtils {
         }
     }
 
+
     public static Bitmap generateBitmap(TreeView tree) {
         NodeModel<String> rootNode = tree.getTreeModel().getRootNode();
 
         final float cacheScale = tree.scale;
         final float scale = 2f / DensityUtils.dp2px(tree.getContext(), 1);
         tree.setScale(scale);
-        int offset = DensityUtils.dp2px(MappingApplication.mContext, 60);
         int w = (int) (rootNode.boxW + DensityUtils.dp2px(MappingApplication.mContext, 60));
         int h = (int) (rootNode.boxH + DensityUtils.dp2px(MappingApplication.mContext, 60));
         Matrix matrix = new Matrix();
 
-
-//        tree.setDrawingCacheEnabled(true);
-//        //measure()实际测量 自己显示在屏幕上的宽高 2个参数，int widthMeasureSpec 和 int heightMeasureSpec表示具体的测量规则。
-//        tree.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-//                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//        //确定View的大小和位置的,然后将其绘制出来
-//        tree.layout(150, 150, tree.getMeasuredWidth(), tree.getMeasuredHeight());
-        //调用getDrawingCache方法就可 以获得view的cache图片
-
-
-//        Bitmap bitmap = Bitmap.createBitmap(tree.getDrawingCache());
         Bitmap bitmap = Bitmap.createBitmap(
                 w,
                 h,
                 Bitmap.Config.RGB_565);
 
-        Point center = new Point(w / 2, w / 2);
-        Point bmpCenter = new Point(bitmap.getWidth() / 2, bitmap.getHeight() / 2);
-//        matrix.postTranslate(center.x - bmpCenter.x, center.y - bmpCenter.y); // 移动到当前view 的中心
 
         Canvas c = new Canvas(bitmap);
 
+
+        if(rootNode.getChildNodes().size()<2){
+            c.translate(60,rootNode.nodeH/2+10);
+        }else {
+            if(rootNode.getChildNodes().get(0).getChildNodes().size()<2){
+                c.translate(60,rootNode.nodeH/2+10);
+            }else {
+                c.translate(60,20);
+            }
+        }
         c.drawColor(Color.WHITE);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(tree.getContext().getResources().getColor(R.color.color_8666f1));
+        paint.setColor(MappingApplication.mContext.getResources().getColor(R.color.color_8666f1));
         paint.setTextSize(25 * scale);
+
         c.drawText(
                 Constant.IMAGE_WATERMARK,
-                bmpCenter.x - DensityUtils.dp2px(MappingApplication.mContext, 60),
-                bitmap.getHeight() - DensityUtils.dp2px(MappingApplication.mContext, 10),
+                bitmap.getWidth() - DensityUtils.dp2px(MappingApplication.mContext, 140 * scale),
+                bitmap.getHeight() - DensityUtils.dp2px(MappingApplication.mContext, 30 * scale),
                 paint);
-
-//        c.drawBitmap(bitmap, matrix, paint);
         tree.draw(c);
         c.save();
         tree.setScale(cacheScale);
