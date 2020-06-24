@@ -7,9 +7,13 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.icu.util.Measure;
 import android.media.MediaScannerConnection;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
 
@@ -83,10 +87,11 @@ public class ImageUtils {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(MappingApplication.mContext.getResources().getColor(R.color.color_8666f1));
         paint.setTextSize(25 * scale);
-
+        Typeface font = Typeface.create(Typeface.SANS_SERIF, Typeface.ITALIC);
+        paint.setTypeface(font);
         c.drawText(
                 Constant.IMAGE_WATERMARK,
-                bitmap.getWidth() - DensityUtils.dp2px(MappingApplication.mContext, 140 * scale),
+                bitmap.getWidth()/2 - DensityUtils.dp2px(MappingApplication.mContext, 140 * scale)/2,
                 bitmap.getHeight() - DensityUtils.dp2px(MappingApplication.mContext, 30 * scale),
                 paint);
         tree.draw(c);

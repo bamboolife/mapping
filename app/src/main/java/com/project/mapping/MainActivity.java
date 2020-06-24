@@ -57,6 +57,7 @@ import com.project.mapping.util.DeviceUtil;
 import com.project.mapping.util.FileBlock;
 import com.project.mapping.util.FileUtils;
 import com.project.mapping.util.ImageUtils;
+import com.project.mapping.util.KeyboardUtils;
 import com.project.mapping.util.RetrofitManager;
 import com.project.mapping.util.SPUtil;
 import com.project.mapping.util.ScreenUtils;
@@ -125,9 +126,10 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         initView();
         treeV = (TreeView) ((ViewGroup) findViewById(R.id.msv)).getChildAt(0);
         treeV.initMapping(null);
-        applyPermission();
         if (SPUtil.getInt("user_privacy", 0) != 1) {
             showUserPrivacy();
+        } else {
+            applyPermission();
         }
 
         if (savedInstanceState != null) {
@@ -143,7 +145,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         privacyDialogFragment.show(getSupportFragmentManager(), "privacy");
     }
 
-    private void applyPermission() {
+    public void applyPermission() {
 
         if (Build.VERSION.SDK_INT >= 23) {
             if (EasyPermissions.hasPermissions(this, perms)) {
@@ -247,6 +249,8 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.iv_drawer_open:
+                KeyboardUtils.hideInput(this);
+
                 mIdDrawerLayout.openDrawer(Gravity.RIGHT);
                 mIsLogin = SPUtil.getBoolean(Constant.LOGIN, false);
                 if (mIsLogin) {
@@ -349,7 +353,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         });
     }
 
-    private void saveTempMap(Callback cb,boolean showDialog) {
+    private void saveTempMap(Callback cb, boolean showDialog) {
         Log.e(TAG, "saveTempMap: " + path);
         if (null == path || path.endsWith(".temp.mapping")) {
             NodeModel root = treeV.getTreeModel().getRootNode();
@@ -370,19 +374,31 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
             } else {
                 if (showDialog) {
                     showNotSaveDialog(fileName.replaceFirst("[.]+", ""), cb);
-                }else{
+                } else {
+                    if (isJumpFileList) {
+                        isSave = false;
+                        isJumpFileList = false;
+                        cb.onSuccesed(null);
+                        return;
+                    }
+                    if (isSave) {
+                        path = null;
+                    }
+
                     saveMap(fileName.replaceFirst("[.]+", ""), true);
+
                 }
 //                showDirPop(this, fileName.replaceFirst("[.]+", ""), cb);
             }
-            isSave = false;
-            isJumpFileList = false;
+
         } else {
             // File could be already deleted in FileListFragment!
             if (new File(path).exists())
                 saveMap(null, true);
             if (cb != null) cb.onSuccesed("");
         }
+        isSave = false;
+        isJumpFileList = false;
     }
 
     private void saveMap(String filename, boolean isShowToast) {
@@ -430,6 +446,29 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         newMap();
+                    }
+                }).create();
+        dialog.show();
+    }   private void showNotSaveLoadDialog(String title, Callback cb) {
+        Dialog dialog = new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前文件尚未保存")
+                .setPositiveButton("保存并新建", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        saveMap("" + title, true);
+                        if (cb != null) {
+                            cb.onSuccesed(null);
+                        }
+                        readFile(title);
+                    }
+                })
+                .setNegativeButton("直接新建", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        readFile(title);
                     }
                 }).create();
         dialog.show();
@@ -518,11 +557,10 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.save:
                 isSave = true;
-                saveTempMap(null,false);
+                saveTempMap(null, false);
                 break;
             case R.id.file_list:
                 isJumpFileList = true;
-
                 saveTempMap(new Callback() {
                     @Override
                     public void onSuccesed(String msg) {
@@ -533,7 +571,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     public void onFail(String msg) {
                         isJumpFileList = false;
                     }
-                },false);
+                }, false);
                 break;
             case R.id.import_image:
 //                ImageUtils.importImage(treeV, this, true, ImageUtils.SD_PATH);
@@ -556,7 +594,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 //                        treeV.initMapping(null);
 //                        path = null;
                     }
-                },true);
+                }, true);
 //				treeV.initMapping(null);
 //				path = null;
                 break;
@@ -674,15 +712,15 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
             mIdDrawerLayout.closeDrawers();
             mIdDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
-        if(baseFragment instanceof SnapPreviewFragment){
+        if (baseFragment instanceof SnapPreviewFragment) {
             getSupportFragmentManager()
 
                     .beginTransaction()
-                    .setCustomAnimations(R.anim.up_down_slide,0,R.anim.up_down_slide,0)
+                    .setCustomAnimations(R.anim.up_down_slide, 0, R.anim.up_down_slide, 0)
                     .replace(R.id.fl_content, baseFragment)
                     .addToBackStack(null)
                     .commit();
-        }else {
+        } else {
             getSupportFragmentManager()
 
                     .beginTransaction()
@@ -785,6 +823,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         Log.e(TAG, "read: " + mFilePath);
         if (path != null) {
             readFile(mFilePath);
+
 //            saveTempMap(new Callback() {
 //                @Override
 //                public void onSuccesed(String msg) {
@@ -796,7 +835,10 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 //                    readFile(mFilePath);
 //                }
 //            });
-        } else readFile(mFilePath);
+        } else{
+            showNotSaveLoadDialog(mFilePath,null);
+        }
+
     }
 
     void readFile(String mFilePath) {

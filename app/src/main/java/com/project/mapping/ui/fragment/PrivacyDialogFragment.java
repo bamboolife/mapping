@@ -107,6 +107,7 @@ public class PrivacyDialogFragment extends DialogFragment {
             public void onClick(View view) {
                 SPUtil.put("user_privacy", 1);
                 dismiss();
+                mainActivity.applyPermission();
             }
         });
 
