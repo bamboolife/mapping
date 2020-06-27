@@ -307,7 +307,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         }
     }
 
-    interface Callback {
+    public interface Callback {
         void onSuccesed(String msg);
 
         void onFail(String msg);
@@ -353,7 +353,8 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         });
     }
 
-    private void saveTempMap(Callback cb, boolean showDialog) {
+
+    public void saveTempMap(Callback cb, int showDialog) {
         Log.e(TAG, "saveTempMap: " + path);
         if (null == path || path.endsWith(".temp.mapping")) {
             NodeModel root = treeV.getTreeModel().getRootNode();
@@ -366,14 +367,21 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     if (cb != null) {
                         cb.onFail("不需要存储");
                         MappingApplication.isRandom = false;
+                        if (showDialog == 2) {
+                            cb.onSuccesed(null);
+                        }
                     }
+
                 }
                 if (isSave) {
                     ToastUtil.showToast("当前无新内容，无需保存", this);
                 }
             } else {
-                if (showDialog) {
+                if (showDialog == 1) {
                     showNotSaveDialog(fileName.replaceFirst("[.]+", ""), cb);
+                } else if (showDialog == 2) {
+                    showNotSaveLoadDialog(fileName.replaceFirst("[.]+", ""), cb);
+
                 } else {
                     if (isJumpFileList) {
                         isSave = false;
@@ -449,11 +457,13 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     }
                 }).create();
         dialog.show();
-    }   private void showNotSaveLoadDialog(String title, Callback cb) {
+    }
+
+    private void showNotSaveLoadDialog(String title, Callback cb) {
         Dialog dialog = new AlertDialog.Builder(this)
                 .setTitle("提示")
                 .setMessage("当前文件尚未保存")
-                .setPositiveButton("保存并新建", new DialogInterface.OnClickListener() {
+                .setPositiveButton("保存并加载", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -461,14 +471,15 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                         if (cb != null) {
                             cb.onSuccesed(null);
                         }
-                        readFile(title);
                     }
                 })
-                .setNegativeButton("直接新建", new DialogInterface.OnClickListener() {
+                .setNegativeButton("覆盖加载", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        readFile(title);
+                        if (cb != null) {
+                            cb.onSuccesed(null);
+                        }
                     }
                 }).create();
         dialog.show();
@@ -557,7 +568,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.save:
                 isSave = true;
-                saveTempMap(null, false);
+                saveTempMap(null, FileLoadType.commonType);
                 break;
             case R.id.file_list:
                 isJumpFileList = true;
@@ -571,7 +582,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                     public void onFail(String msg) {
                         isJumpFileList = false;
                     }
-                }, false);
+                }, FileLoadType.commonType);
                 break;
             case R.id.import_image:
 //                ImageUtils.importImage(treeV, this, true, ImageUtils.SD_PATH);
@@ -594,7 +605,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 //                        treeV.initMapping(null);
 //                        path = null;
                     }
-                }, true);
+                }, FileLoadType.showNotSave);
 //				treeV.initMapping(null);
 //				path = null;
                 break;
@@ -835,8 +846,9 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 //                    readFile(mFilePath);
 //                }
 //            });
-        } else{
-            showNotSaveLoadDialog(mFilePath,null);
+        } else {
+            readFile(mFilePath);
+
         }
 
     }
@@ -895,5 +907,12 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
         outState.putString("EditorMapPath", path);
+    }
+
+
+    public @interface FileLoadType{
+        int loadListType=2;
+        int showNotSave=1;
+        int commonType=0;
     }
 }

@@ -122,8 +122,19 @@ public class FileListFragment extends BaseFragment implements View.OnClickListen
                     readLocFile(onFolder);
                     fileAdapter.notifyDataSetChanged();
                 } else {
-                    ((MainActivity) getActivity()).read(allFiles.get(position).fullPath());
-                    back();
+                    ((MainActivity) getActivity()).saveTempMap(new MainActivity.Callback() {
+                        @Override
+                        public void onSuccesed(String msg) {
+                            ((MainActivity) getActivity()).read(allFiles.get(position).fullPath());
+                            back();
+                        }
+
+                        @Override
+                        public void onFail(String msg) {
+
+                        }
+                    }, MainActivity.FileLoadType.loadListType);
+
                 }
             }
         });
