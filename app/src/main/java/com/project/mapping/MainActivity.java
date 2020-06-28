@@ -29,6 +29,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -462,8 +463,8 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     private void showNotSaveLoadDialog(String title, Callback cb) {
         Dialog dialog = new AlertDialog.Builder(this)
                 .setTitle("提示")
-                .setMessage("当前文件尚未保存")
-                .setPositiveButton("保存并加载", new DialogInterface.OnClickListener() {
+                .setMessage("保存现在的导图？")
+                .setPositiveButton("是", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -473,7 +474,7 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
                         }
                     }
                 })
-                .setNegativeButton("覆盖加载", new DialogInterface.OnClickListener() {
+                .setNegativeButton("否", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -828,6 +829,16 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
         finish();
     }
 
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     String path = null;
 
     public void read(final String mFilePath) {
@@ -847,7 +858,18 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
 //                }
 //            });
         } else {
-            readFile(mFilePath);
+            saveTempMap(new MainActivity.Callback() {
+                @Override
+                public void onSuccesed(String msg) {
+                    readFile(mFilePath);
+                }
+
+                @Override
+                public void onFail(String msg) {
+                    readFile(mFilePath);
+
+                }
+            }, MainActivity.FileLoadType.loadListType);
 
         }
 
@@ -910,9 +932,9 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
 
-    public @interface FileLoadType{
-        int loadListType=2;
-        int showNotSave=1;
-        int commonType=0;
+    public @interface FileLoadType {
+        int loadListType = 2;
+        int showNotSave = 1;
+        int commonType = 0;
     }
 }
