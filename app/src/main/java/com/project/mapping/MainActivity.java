@@ -71,6 +71,7 @@ import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.tencent.stat.NetworkManager;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 import com.trello.rxlifecycle2.android.FragmentEvent;
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
@@ -160,8 +161,10 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void init() {
-        initData();
-        initWeChat();
+        if (NetworkManager.getInstance(this).isNetworkAvailable()) {
+            initData();
+            initWeChat();
+        }
     }
 
     private void initWeChat() {
@@ -902,13 +905,16 @@ public class MainActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (EasyPermissions.hasPermissions(this,
-                    Manifest.permission.READ_PHONE_STATE)) {
+        if (NetworkManager.getInstance(this).isNetworkAvailable()) {
+
+            if (Build.VERSION.SDK_INT >= 23) {
+                if (EasyPermissions.hasPermissions(this,
+                        Manifest.permission.READ_PHONE_STATE)) {
+                    getOrderType();
+                }
+            } else {
                 getOrderType();
             }
-        } else {
-            getOrderType();
         }
     }
 
